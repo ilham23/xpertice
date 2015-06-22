@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using HtmlAgilityPack;
+
 
 namespace xpertice
 {
@@ -13,15 +16,42 @@ namespace xpertice
         
         static void Main(string[] args)
         {
-            var regex = new Regex(@"<a id=""ctl00_hplMoney"" (.*?)>(.*?)<\/a>");
+            HtmlDocument htmlDoc = new HtmlDocument();
+        
+            htmlDoc.DetectEncodingAndLoad("D:\\Xpert Eleven - A.F.C. JDT..html");
+            //htmlDoc.DetectEncodingAndLoad("http://xperteleven.com/players.aspx?dh=1&TeamID=92562&Boost=1");
 
-            var match = regex.Match(filename);
+            if (htmlDoc.ParseErrors != null && htmlDoc.ParseErrors.Count() > 0)
+            {
+                // Handle any parse errors as required
 
-            var result = match.Groups[2].Value;
-            Console.WriteLine("econ: " + result);
+            }
+            else
+            {
+                if (htmlDoc.DocumentNode != null)
+                {
+                    var htmlPlayers = htmlDoc.GetElementbyId("ctl00_cphMain_dgPlayers");
 
-            regex = new Regex(@"<table (.*?) id=""ctl00_cphMain_dgPlayers""(.*?)>(.*?)<\/table>");
-            match = regex.Match(filename);
+                    if (htmlPlayers != null)
+                    {
+                        var players = htmlPlayers.ChildNodes[1].ChildNodes;
+
+                        int counter = 0;
+                        foreach (var player in players)
+                        {
+                            counter++; 
+                            if (counter == 1 || counter == players.Count)
+                            {
+                                continue;
+                            }
+                            var playerName = player.ChildNodes[3].ChildNodes[3].InnerHtml;
+                            var playerSkill = player.ChildNodes[5].ChildNodes[1].;
+                            Console.WriteLine(playerName + ": " + playerSkill);
+                        }
+
+                    }
+                }
+            }
 
             Console.ReadKey();
         }
