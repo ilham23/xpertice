@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using HtmlAgilityPack;
+using xpertice.Utility;
 
 
 namespace xpertice
@@ -30,23 +31,30 @@ namespace xpertice
             {
                 if (htmlDoc.DocumentNode != null)
                 {
-                    var htmlPlayers = htmlDoc.GetElementbyId("ctl00_cphMain_dgPlayers");
+                    var htmlTablePlayers = htmlDoc.GetElementbyId("ctl00_cphMain_dgPlayers");
 
-                    if (htmlPlayers != null)
+                    if (htmlTablePlayers != null)
                     {
-                        var players = htmlPlayers.ChildNodes[1].ChildNodes;
+                        var htmlPlayers = htmlTablePlayers.ChildNodes[1].ChildNodes;
 
                         int counter = 0;
-                        foreach (var player in players)
+
+                        Player player = new Player();
+                        foreach (var htmlPlayer in htmlPlayers)
                         {
                             counter++; 
-                            if (counter == 1 || counter == players.Count)
+                            if (counter == 1 || counter == htmlPlayers.Count)
                             {
                                 continue;
                             }
-                            var playerName = player.ChildNodes[3].ChildNodes[3].InnerHtml;
-                            var playerSkill = player.ChildNodes[5].ChildNodes[1].;
-                            Console.WriteLine(playerName + ": " + playerSkill);
+
+                            var playerName = player.GetName(htmlPlayer);
+                            var playerSkill = player.GetSkill(htmlPlayer);
+                            var playerForm = player.GetForm(htmlPlayer);
+                            var playerAvgForm = player.GetAverageForm(htmlPlayer);
+                            var playerFT = player.GetFormTendency(htmlPlayer);
+
+                            Console.WriteLine(playerName + ": " + playerSkill + " - " + playerForm + " - " + playerAvgForm + " - " + playerFT);
                         }
 
                     }
